@@ -3,53 +3,52 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     Page.Title = "Home Page";
 }
-<div id="map-container" style="width: 100%; min-height: 200px;"></div>
 
-<div class="box map-form">
-    <div class="box-body">
-        <div class="row margin-bottom">
-            <div class="col-xs-12 col-md-6">
-                <div class='input-group date setdatetimepicker'>
-                    <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
-                    <span class="input-group-addon">
-                        <span class="fa fa-calendar"></span>
-                    </span>
+
+<div ng-controller ="rotaplus-map-controller">
+
+    <div gmap-map-context gm-map-model="currentMap" gm-map-container="#map-container">
+
+        <div id="map-container" style="width: 100%; min-height: 200px;"></div>
+
+        <div class="box map-form">
+            <div class="box-body">
+                <div class="row margin-bottom">
+                    <div class="col-xs-12 col-md-6">
+                        <div class='input-group date setdatetimepicker'>
+                            <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6">
+                        <div class='input-group date setdatetimepicker'>
+                            <input type="number" class="form-control " id="txtTrecho" placeholder="KMs Por Trecho." data-toggle="tooltip" data-placement="bottom" title="Informe a quentidade de quilometros que deseja percorer entre as paradas.">
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-xs-12 col-md-6">
-                <div class='input-group date setdatetimepicker'>
-                    <input type="number" class="form-control " id="txtTrecho" placeholder="KMs Por Trecho." data-toggle="tooltip" data-placement="bottom" title="Informe a quentidade de quilometros que deseja percorer entre as paradas.">
-                    <span class="input-group-addon">
-                        <span class="fa fa-calendar"></span>
-                    </span>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class='input-group'>
+                            <input type="text" id="txtWaypoint" class="form-control" gmap-address-autocomplete gm-map-model="currentMap" gm-address-model="addressAutoComplete" placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
+                            <span id="btnFindWaypoint" class="input-group-addon">
+                                <span class="fa fa-map-marker"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <button ng-click="test()">Testar</button>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class='input-group'>
-                    <input type="text" id="txtWaypoint" class="form-control" gmap-address-autocomplete placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
-                    <span id="btnFindWaypoint" class="input-group-addon">
-                        <span class="fa fa-map-marker"></span>
-                    </span>
-                </div>
-            </div>
-        </div>
-
     </div>
-
-
-
-    
-
-
-    
-
-
-
 </div>
-
-
 @section Scripts{
     <script type="text/javascript">
         var GoogleMap = null;

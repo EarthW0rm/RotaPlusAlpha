@@ -24,10 +24,12 @@
 
     BundleTable.Bundles.Add(new ScriptBundle("~/ScriptsBundle/GMap")
         .Include("~/Scripts/gmap/gmap.js")
+        .Include("~/Scripts/gmap/directives/gmap-map-context.js")
         .Include("~/Scripts/gmap/directives/gmap-address-autocomplete.js"));
 
     BundleTable.Bundles.Add(new ScriptBundle("~/ScriptsBundle/RotaPlus")
-    .Include("~/Scripts/rotaplus/rotaplus.js"));
+    .Include("~/Scripts/rotaplus/rotaplus.js")
+    .Include("~/Scripts/rotaplus/rotaplus-map-controller.js"));
 
     BundleTable.Bundles.Add(new StyleBundle("~/StylesBundle/Plugins")
         .Include("~/Scripts/plugins/angular/angular-csp.css")

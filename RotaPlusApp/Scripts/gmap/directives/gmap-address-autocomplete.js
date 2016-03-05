@@ -1,17 +1,26 @@
 ﻿var gmap = angular.module("gmap");
 
-gmap.directive('gmapAddressAutocomplete', ['$compile', '$rootScope', function ($compile, $rootScope) {
+gmap.directive('gmapAddressAutocomplete', [function () {
     return {
         restrict: 'A'
-        , link: function (scope, element, attrs) {
-            if (!scope.gmapAutocomplete) {
-                scope.gmapAutocomplete = new google.maps.places.Autocomplete(element[0]);
-                //scope.gmapAutocomplete.bindTo('bounds', $rootScope.GoogleMap);
-                scope.gmapAutocomplete.addListener('place_changed', function () {
-                    debugger;
-                    var place = scope.gmapAutocomplete.getPlace();
-                });
-            }
+        , scope: {
+            currentMap: '=gmMapModel'
+            , currentAddresModel: '@gmAddressModel'
+        }
+        , link: {
+            pre: function preLink(scope, element, attrs) {
+                if (!scope.gmapAutocomplete) {
+                    scope.gmapAutocomplete = new google.maps.places.Autocomplete(element[0]);
+
+                    if(scope.currentMap)
+                        scope.gmapAutocomplete.bindTo('bounds', scope.currentMap);
+
+                    scope.gmapAutocomplete.addListener('place_changed', function () {
+                        scope.$parent[scope.currentAddresModel] = scope.gmapAutocomplete.getPlace();
+                    });
+                }
+            },
+            post: function postLink(scope, element, attrs) { return; }
         }
     };
 
