@@ -1,0 +1,67 @@
+﻿@using System.Web.Optimization;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    Page.Title = "Home Page";
+}
+<div id="map-container" style="width: 100%; min-height: 200px;"></div>
+
+<div class="box map-form">
+    <div class="box-body">
+        <div class="row margin-bottom">
+            <div class="col-xs-12 col-md-6">
+                <div class='input-group date setdatetimepicker'>
+                    <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <div class='input-group date setdatetimepicker'>
+                    <input type="number" class="form-control " id="txtTrecho" placeholder="KMs Por Trecho." data-toggle="tooltip" data-placement="bottom" title="Informe a quentidade de quilometros que deseja percorer entre as paradas.">
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class='input-group'>
+                    <input type="text" id="txtWaypoint" class="form-control" placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
+                    <span id="btnFindWaypoint" class="input-group-addon">
+                        <span class="fa fa-map-marker"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    
+
+
+    
+
+
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var mapHeight = screen.height- 175;
+            $('#map-container').css('height', mapHeight + 'px');
+
+            this.GoogleMap = new google.maps.Map($('#map-container')[0], {
+                center: { lat: -23.608336, lng: -46.646996 },
+                zoom: 8,
+                mapTypeControl: false
+            });
+        });
+    </script>        
+}
