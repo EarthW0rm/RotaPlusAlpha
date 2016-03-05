@@ -12,7 +12,7 @@
     <title>Calculadora de Rotas - RotaPlus</title>
 
 </head>
-<body class="skin-blue sidebar-mini wysihtml5-supported">
+<body class="skin-blue sidebar-mini wysihtml5-supported" ng-app="rotaplus">
     <div class="wrapper">
         <header class="main-header">
             <a href="#" class="logo">
@@ -146,7 +146,7 @@
                                 </li>
                             </ul>
                         </li>
-                       
+
 
                     </ul>
                 </div>
@@ -162,7 +162,9 @@
 
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpfg4bfsWD_0x3MWm1vmP_PHuFadeXPQs&libraries=places"></script>
     @Scripts.Render("~/ScriptsBundle/Plugins")
-    
+    @Scripts.Render("~/ScriptsBundle/GMap")
+    @Scripts.Render("~/ScriptsBundle/RotaPlus")
+
     @RenderSection("Scripts")
 
 </body>

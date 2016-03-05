@@ -28,7 +28,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class='input-group'>
-                    <input type="text" id="txtWaypoint" class="form-control" placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
+                    <input type="text" id="txtWaypoint" class="form-control" gmap-address-autocomplete placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
                     <span id="btnFindWaypoint" class="input-group-addon">
                         <span class="fa fa-map-marker"></span>
                     </span>
@@ -52,16 +52,11 @@
 
 @section Scripts{
     <script type="text/javascript">
-        $(document).ready(function () {
+        var GoogleMap = null;
+        //$(document).ready(function () {
 
             var mapHeight = screen.height- 175;
-            $('#map-container').css('height', mapHeight + 'px');
-
-            this.GoogleMap = new google.maps.Map($('#map-container')[0], {
-                center: { lat: -23.608336, lng: -46.646996 },
-                zoom: 8,
-                mapTypeControl: false
-            });
-        });
+            
+        //});
     </script>        
 }
