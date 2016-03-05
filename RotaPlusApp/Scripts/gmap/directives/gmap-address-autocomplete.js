@@ -17,6 +17,7 @@ gmap.directive('gmapAddressAutocomplete', [function () {
 
                     scope.gmapAutocomplete.addListener('place_changed', function () {
                         scope.$parent[scope.currentAddresModel] = scope.gmapAutocomplete.getPlace();
+                        scope.$apply();
                     });
                 }
             },

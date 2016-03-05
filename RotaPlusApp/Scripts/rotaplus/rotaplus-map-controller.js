@@ -4,10 +4,18 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
     $scope.addressAutoComplete = null;
 
     $scope.test = function () {
-        debugger;
-
+        
         geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
             debugger;
         });
     }
+
+    $scope.$watch('addressAutoComplete', function (newValue, oldValue) {
+        if ($scope.addressAutoComplete != null) {
+            geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
+                debugger;
+            });
+        }
+
+    })
 }]);
