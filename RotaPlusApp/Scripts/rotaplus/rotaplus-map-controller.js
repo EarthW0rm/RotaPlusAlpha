@@ -1,10 +1,13 @@
 ﻿var rotaplus = angular.module('rotaplus');
-rotaplus.controller('rotaplus-map-controller',['$scope', function ($scope) {
+rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', function ($scope, geoCode) {
     $scope.currentMap = null;
     $scope.addressAutoComplete = null;
 
     $scope.test = function () {
-        var te = $scope;
         debugger;
+
+        geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
+            debugger;
+        });
     }
 }]);
