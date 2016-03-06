@@ -5,7 +5,7 @@
 }
 
 
-<div ng-controller ="rotaplus-map-controller">
+<div ng-controller="rotaplus-map-controller">
 
     <div gmap-map-context gm-map-model="currentMap" gm-map-container="#map-container">
 
@@ -42,30 +42,14 @@
                     </div>
                 </div>
 
+                
+
                 <div class="row">
-                    <ul class="waypoints">
-                        <li class="waypoint-item">
+                    <ul class="waypoints" rotaplus-sortable rp-array-sorted="waypoints">
+                        <li ng-repeat="waypoint in waypoints" class="waypoint-item" ng-animate c-index="{{$index}}">
                             <small class="label label-warning pull-right"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Partida</small>
                             <div>
-                                <span class="address">Rua Humaitá, 120 02517-010 São Paulo - Brasil</span>
-                            </div>
-                        </li>
-                        <li class="waypoint-item">
-                            <small class="label label-warning pull-right"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;1 hora e 2 mins</small>
-                            <div>
-                                <span class="address">Rua Humaitá, 120 02517-010 São Paulo - Brasil</span>
-                            </div>
-                        </li>
-                        <li class="waypoint-item">
-                            <small class="label label-warning pull-right"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;1 hora e 2 mins</small>
-                            <div>
-                                <span class="address">Rua Humaitá, 120 02517-010 São Paulo - Brasil</span>
-                            </div>
-                        </li>
-                        <li class="waypoint-item">
-                            <small class="label label-success pull-right"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Chegada</small>
-                            <div>
-                                <span class="address">Rua Humaitá, 120 02517-010 São Paulo - Brasil</span>
+                                <span class="address">{{waypoint.formatted_address}}</span>
                             </div>
                         </li>
                     </ul>
@@ -81,10 +65,16 @@
 @section Scripts{
     <script type="text/javascript">
         var GoogleMap = null;
-        //$(document).ready(function () {
+        $(document).ready(function () {
 
-            var mapHeight = screen.height- 175;
             
-        //});
+            //$(".waypoints").sortable({
+            //    stop: function (event, ui) {
+            //        debugger;
+            //    }
+            //});
+
+            
+        });
     </script>        
 }

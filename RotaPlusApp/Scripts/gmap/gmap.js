@@ -2,7 +2,7 @@
 
 gmap.run(['$rootScope', function ($rootScope) {
     /*Run gmap module*/
-
+    var mapHeight = screen.height - 175;
     $('#map-container').css('height', mapHeight + 'px');
 
     $rootScope.GoogleMap = new google.maps.Map($('#map-container')[0], {
