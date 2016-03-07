@@ -3,14 +3,14 @@
     BundleTable.Bundles.IgnoreList.Clear();
 
     BundleTable.Bundles.Add(new ScriptBundle("~/ScriptsBundle/Plugins")
-        .Include("~/Scripts/plugins/moment/moment-with-locales.js")
         .Include("~/Scripts/plugins/moment/moment.js")
+        .Include("~/Scripts/plugins/moment/moment-with-locales.js")
         .Include("~/Scripts/plugins/jquery/jquery-2.2.1.js")
         .Include("~/Scripts/plugins/jquery/jquery-ui-1.11.4.js")
         .Include("~/Scripts/plugins/bootstrap/bootstrap.js")
         .Include("~/Scripts/plugins/bootstrap-datetimepicker/bootstrap-datetimepicker.js")
         .Include("~/Scripts/plugins/angular/angular.js")
-        //.Include("~/Scripts/plugins/angular/i18n/angular-locale_pt-br.js")
+        .Include("~/Scripts/plugins/angular/i18n/angular-locale_pt-br.js")
         .Include("~/Scripts/plugins/angular/angular-animate.js")
         .Include("~/Scripts/plugins/angular/angular-aria.js")
         .Include("~/Scripts/plugins/angular/angular-cookies.js")    
@@ -32,6 +32,9 @@
     BundleTable.Bundles.Add(new ScriptBundle("~/ScriptsBundle/RotaPlus")
     .Include("~/Scripts/rotaplus/rotaplus.js")
     .Include("~/Scripts/rotaplus/rotaplus-map-controller.js")
+    .Include("~/Scripts/rotaplus/directives/rotaplus-tooltip.js")
+    .Include("~/Scripts/rotaplus/directives/rotaplus-datetime-picker.js")
+    .Include("~/Scripts/rotaplus/directives/rotaplus-time-picker.js")
     .Include("~/Scripts/rotaplus/directives/rotaplus-sortable.js"));
 
     BundleTable.Bundles.Add(new StyleBundle("~/StylesBundle/Plugins")

@@ -7681,3 +7681,36 @@ table.text-center th {
         .waypoints .waypoint-item .box-tools {
        
         }
+
+                .waypoints li { }
+
+.waypoints li.ng-move,
+.waypoints li.ng-enter,
+.waypoints li.ng-leave {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+
+.waypoints li.ng-leave.ng-leave-active,
+.waypoints li.ng-move,
+.waypoints li.ng-enter {
+  opacity:0;
+}
+
+.waypoints li.ng-leave,
+.waypoints li.ng-move.ng-move-active,
+.waypoints li.ng-enter.ng-enter-active {
+  opacity:1;
+}
+
+.bootstrap-datetimepicker-widgit div {
+    color: black !important;
+}
+.label-time {
+}
+
+.label-time i {
+}
+
+.label-time input {background-color: #00a65a;border: none;color: #fff;width: 50px;}
+

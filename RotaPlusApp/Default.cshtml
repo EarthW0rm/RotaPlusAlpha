@@ -17,15 +17,15 @@
                     
                     <div class="col-md-3 col-xs-12 pull-right margin-bottom">
                         <div class='input-group date setdatetimepicker'>
-                            <input type="number" class="form-control " id="txtTrecho" placeholder="KMs Por Trecho." data-toggle="tooltip" data-placement="bottom" title="Informe a quentidade de quilometros que deseja percorer entre as paradas.">
+                            <input type="number" class="form-control" ng-model="PathSize" id="txtTrecho" placeholder="KMs Por Trecho." rotaplus-tooltip rptooltipplace="bottom" title="Informe a quantidade de quilometros que deseja percorrer entre as paradas.">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
                         </div>
                     </div>
                     <div class="col-md-4 col-xs-12 pull-right margin-bottom">
-                        <div class='input-group date setdatetimepicker'>
-                            <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
+                        <div class='input-group'>
+                            <input type="datetime" rotaplus-datetime-picker ng-model="DepartureDate" class="form-control" id="txtDepartureDate" placeholder="Data de Saida" rotaplus-tooltip rpTooltipPlace="bottom" title="Informe a Data de Partida para o trajeto.">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -50,16 +50,26 @@
                                 <i class="fa fa-ellipsis-v"></i>
                                 <i class="fa fa-ellipsis-v"></i>
                             </span>
-                            <!-- checkbox -->
-                            <input type="checkbox" value="" name="">
                             <!-- todo text -->
                             <span class="text" ng-bind="waypoint.input_string"></span>
                             <!-- Emphasis label -->
-                            <small class="label label-danger"><i class="fa fa-clock-o"></i> 2 mins</small>
+                            <small ng-show="$first" class="label label-info">
+                                <i class="fa fa-play"></i> partida
+                            </small>
+
+                            <small ng-show="$last && !$first" class="label label-info">
+                                <i class="fa fa-stop"></i> chegada
+                            </small>
+
+                            <small ng-if="!$first && !$last" class="label label-success label-time" rotaplus-tooltip title="Alterar tempo de parada">
+                                <i class="fa fa-pause"></i>
+                                <input rotaplus-time-picker ng-model="waypoint.stopTimeControl" date-time-picker-format="HH:mm" value="Sem parada" type="text">
+                            </small>
+                                                        
                             <!-- General tools such as edit or delete-->
                             <div class="tools">
-                                <i class="fa fa-edit"></i>
-                                <i class="fa fa-trash-o"></i>
+                                <i class="fa fa-edit" ng-show="!$last && !first"></i>
+                                <i class="fa fa-trash-o" ng-click="RemoverWayPoint($index)"></i>
                             </div>
                         </li>
                     </ul>

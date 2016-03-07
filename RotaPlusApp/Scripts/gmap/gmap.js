@@ -4,12 +4,6 @@ gmap.run(['$rootScope', function ($rootScope) {
     /*Run gmap module*/
     var mapHeight = screen.height - 175;
     $('#map-container').css('height', mapHeight + 'px');
-    $('.waypoints').css('max-height', (mapHeight - 300) + 'px');
-
-    $rootScope.GoogleMap = new google.maps.Map($('#map-container')[0], {
-        center: { lat: -23.608336, lng: -46.646996 },
-        zoom: 8,
-        mapTypeControl: false
-    });
+    $('.waypoints').css('max-height', (mapHeight - 400) + 'px');
 
 }]);

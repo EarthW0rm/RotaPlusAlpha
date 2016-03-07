@@ -218,6 +218,7 @@
 .bootstrap-datetimepicker-widget table {
   width: 100%;
   margin: 0;
+  color: #444 !important;
 }
 .bootstrap-datetimepicker-widget table td,
 .bootstrap-datetimepicker-widget table th {
@@ -351,6 +352,7 @@
 .bootstrap-datetimepicker-widget.usetwentyfour td.hour {
   height: 27px;
   line-height: 27px;
+  color: #444;
 }
 .bootstrap-datetimepicker-widget.wider {
   width: 21em;
