@@ -5,7 +5,7 @@
 }
 
 
-<div ng-controller="rotaplus-map-controller">
+<div ng-controller="rotaplus-map-controller" ng-cloak>
 
     <div gmap-map-context gm-map-model="currentMap" gm-map-container="#map-container">
 
@@ -13,16 +13,9 @@
 
         <div class="box map-form">
             <div class="box-body">
-                <div class="row margin-bottom">
-                    <div class="col-xs-12 col-md-6">
-                        <div class='input-group date setdatetimepicker'>
-                            <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
-                            <span class="input-group-addon">
-                                <span class="fa fa-calendar"></span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-xs-12 col-md-6">
+                <div class="row">
+                    
+                    <div class="col-md-3 col-xs-12 pull-right margin-bottom">
                         <div class='input-group date setdatetimepicker'>
                             <input type="number" class="form-control " id="txtTrecho" placeholder="KMs Por Trecho." data-toggle="tooltip" data-placement="bottom" title="Informe a quentidade de quilometros que deseja percorer entre as paradas.">
                             <span class="input-group-addon">
@@ -30,9 +23,15 @@
                             </span>
                         </div>
                     </div>
-                </div>
-                <div class="row margin-bottom">
-                    <div class="col-md-12">
+                    <div class="col-md-4 col-xs-12 pull-right margin-bottom">
+                        <div class='input-group date setdatetimepicker'>
+                            <input type="datetime" class="form-control " id="txtDepartureDate" placeholder="Data de Saida" data-toggle="tooltip" data-placement="bottom" title="Informe a Data de Partida para o trajeto.">
+                            <span class="input-group-addon">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-xs-12 pull-right margin-bottom">
                         <div class='input-group'>
                             <input type="text" id="txtWaypoint" class="form-control" gmap-address-autocomplete gm-map-model="currentMap" gm-address-model="addressAutoComplete" placeholder="Novo Waypoint" data-toggle="tooltip" data-placement="bottom" title="Informe o local que deseja adicionar ao trajeto.">
                             <span id="btnFindWaypoint" class="input-group-addon">
@@ -40,20 +39,36 @@
                             </span>
                         </div>
                     </div>
+                    
                 </div>
 
-                
-
-                <div class="row">
-                    <ul class="waypoints" rotaplus-sortable rp-array-sorted="waypoints">
-                        <li ng-repeat="waypoint in waypoints" class="waypoint-item" ng-animate c-index="{{$index}}">
-                            <small class="label label-warning pull-right"><i class="fa fa-clock-o"></i>&nbsp;&nbsp;Partida</small>
-                            <div>
-                                <span class="address">{{waypoint.formatted_address}}</span>
+                <div class="row margin-bottom">
+                    <ul class="todo-list waypoints" rotaplus-sortable rp-array-sorted-model="waypoints">
+                        <li ng-repeat="waypoint in waypoints" class="waypoint-item" ng-animate>
+                            <!-- drag handle -->
+                            <span class="handle ui-sortable-handle">
+                                <i class="fa fa-ellipsis-v"></i>
+                                <i class="fa fa-ellipsis-v"></i>
+                            </span>
+                            <!-- checkbox -->
+                            <input type="checkbox" value="" name="">
+                            <!-- todo text -->
+                            <span class="text" ng-bind="waypoint.input_string"></span>
+                            <!-- Emphasis label -->
+                            <small class="label label-danger"><i class="fa fa-clock-o"></i> 2 mins</small>
+                            <!-- General tools such as edit or delete-->
+                            <div class="tools">
+                                <i class="fa fa-edit"></i>
+                                <i class="fa fa-trash-o"></i>
                             </div>
                         </li>
                     </ul>
+
                 </div>
+
+
+
+                
 
                 <div class="row">
                     <button ng-click="test()">Testar</button>
@@ -73,7 +88,9 @@
             //        debugger;
             //    }
             //});
-
+            $(".label-time").datetimepicker({
+                format: 'H:mm'
+            });
             
         });
     </script>        

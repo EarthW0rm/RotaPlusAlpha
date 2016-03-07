@@ -6,40 +6,31 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
     $scope.waypoints = [];
 
     $scope.test = function () {
-        
-        geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
-            
-        });
+        debugger;
     }
 
     $scope.$watch('addressAutoComplete', function (newValue, oldValue) {
-        if ($scope.addressAutoComplete != null) {
-            geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
-                $scope.waypoints.push(data.result);
-            });
-        }
-
+        if ($scope.addressAutoComplete != null)
+            $scope.IncluirWayPoint($scope.addressAutoComplete);
     });
 
+    $scope.IncluirWayPoint = function (waypointInfo) {
+        geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
+            var duplicated = false;
 
+            for (var i = 0; i < $scope.waypoints.length; i++) {
+                if ($scope.waypoints[i].compare(data.result.selectedLocation)) {
+                    duplicated = true;
+                    break;
+                }
+            }
 
-    //$scope.dragStart = function (e, ui) {
-    //    ui.item.data('start', ui.item.index());
-    //}
+            if (!duplicated)
+                $scope.waypoints.push(data.result);
+            else
+                window.alert('Localidade já adicionada.');
+        });
+    }
 
-    //$scope.dragEnd = function (e, ui) {
-    //    var start = ui.item.data('start'),
-    //        end = ui.item.index();
-
-    //    $scope.waypoints.splice(end, 0,
-    //        $scope.waypoints.splice(start, 1)[0]);
-
-    //    $scope.$apply();
-    //}
-
-    //var sortableEle = $('.waypoints').sortable({
-    //    start: $scope.dragStart,
-    //    update: $scope.dragEnd
-    //});
 
 }]);

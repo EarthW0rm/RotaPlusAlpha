@@ -10,6 +10,7 @@ gmap.directive('gmapAddressAutocomplete', [function () {
         , link: {
             pre: function preLink(scope, element, attrs) {
                 if (!scope.gmapAutocomplete) {
+                    scope.inputElement = element[0];
                     scope.gmapAutocomplete = new google.maps.places.Autocomplete(element[0]);
 
                     if(scope.currentMap)
@@ -17,6 +18,7 @@ gmap.directive('gmapAddressAutocomplete', [function () {
 
                     scope.gmapAutocomplete.addListener('place_changed', function () {
                         scope.$parent[scope.currentAddresModel] = scope.gmapAutocomplete.getPlace();
+                        scope.inputElement.value = "";
                         scope.$apply();
                     });
                 }

@@ -7619,13 +7619,15 @@ table.text-center th {
 }
 
 .map-form {
-    width: 350px;
-    margin: 0px auto;
+    width: 100%;
+    margin: 10px 0px 0px 20px;
     background-color: transparent;
     border: none;
-    position: fixed;
-    top: 60px;
-    left: 20px;
+    padding-right: 35px;
+    max-width: 670px;
+    /* position: fixed; */
+    /* top: 60px; */
+    /* left: 20px; */
 }
 
 .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
@@ -7649,41 +7651,33 @@ table.text-center th {
     }
 
 .waypoints {
-    list-style: none;
-    padding: 0px 0px 0px 0px;
-    float: left;
+    
 }
 
     .waypoints .waypoint-item {
-        float: left;
-        width: 100%;
+       
     }
 
-        .waypoints .waypoint-item > div {
-            min-height: 30px;
-            float: left;
-            width: 100%;
-            padding-left: 10px;
-            border-radius: 5px;
-            padding-right: 10px;
-            background-color:#3c8dbc;
-            -webkit-box-shadow: 0px 0px 5px 4px rgba(60, 141, 188, 0.6);
-            -moz-box-shadow: 0px 0px 5px 4px rgba(60, 141, 188, 0.6);
-            box-shadow: 0px 0px 5px 4px rgba(60, 141, 188, 0.6);
+        .waypoints .waypoint-item > div.c-address {
+         
         }
 
-            .waypoints .waypoint-item > div span.address {
-                color: white;
-                font-weight: bold;
-                width: 100%;
-                margin-top: 9px;
-                margin-bottom: 5px;
-                float: left;
+            .waypoints .waypoint-item > div.c-address span.address {
+          
             }
 
-        .waypoints .waypoint-item small {
+            .waypoints .waypoint-item > div.c-address .input-group{
+                
+            }
+
+        /*.waypoints .waypoint-item small {
             position: relative;
             right: -15px;
             top: 8px;
             z-index: 999;
+        }*/
+
+
+        .waypoints .waypoint-item .box-tools {
+       
         }

@@ -11,7 +11,10 @@ gmap.service("gmap-geocode-service", function ($q) {
         var latLng = null;
 
         if (autocompleteData.geometry) {
-            latLng = autocompleteData.geometry.location;
+            latLng = {
+                lat: autocompleteData.geometry.location.lat()
+                , lng: autocompleteData.geometry.location.lng()
+            };
         } else {
             try {
                 var latlngRegExp = new RegExp(/([ ]*)?([-+]?[0-9]+([.]{0,1})?([0-9]+)?)([ ]*)?([,])([ ]*)?([-+]?[0-9]+([.]{0,1})?([0-9]+)?)([ ]*)?/g);
@@ -38,8 +41,16 @@ gmap.service("gmap-geocode-service", function ($q) {
                             geodata: results
                             , selectedLocation: latLng
                             , formatted_address: ""
+                            , compare: function (location) {
+                                return location.lat == this.selectedLocation.lat && location.lng == this.selectedLocation.lng
+                            }
                         }
                     };
+
+                    if (autocompleteData.formatted_address)
+                        rObj.result.input_string = autocompleteData.formatted_address;
+                    else if (autocompleteData.name)
+                        rObj.result.input_string = autocompleteData.name;
 
                     for (var i = 0; i < results.length; i++) {
                         if (results[i].formatted_address.toUpperCase().indexOf("UNNAMED") < 0) {

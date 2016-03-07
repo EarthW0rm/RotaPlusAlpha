@@ -4,7 +4,7 @@ gmap.directive('rotaplusSortable', ['$compile', '$rootScope', function ($compile
     return {
         restrict: 'A'
         , scope: {
-            arrayItens: '@rpArraySorted'
+            arrayItens: '@rpArraySortedModel'
         }
         , link: function preLink(scope, element, attrs) {
 

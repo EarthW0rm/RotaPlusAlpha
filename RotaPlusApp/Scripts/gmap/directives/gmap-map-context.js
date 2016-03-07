@@ -15,6 +15,9 @@ gmap.directive('gmapMapContext', ['$compile', '$rootScope', function ($compile, 
                         mapTypeControl: false
                     });
 
+
+                scope.$parent[scope.currentMap].controls[google.maps.ControlPosition.TOP_LEFT].push($('.map-form')[0]);
+                //.map-form
                 //TODO: Incluir listener para click
             },
             post: function postLink(scope, element, attrs) { return; }
