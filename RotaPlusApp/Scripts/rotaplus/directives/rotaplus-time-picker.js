@@ -55,7 +55,7 @@ gmap.directive("rotaplusTimePicker", function () {
                             stime += tM > 0 ? (tH > 0 ? 'e ' : '') + tM + (tM > 1 ? ' minutos' : 'minuto') : '';
 
                             if (stime == "")
-                                stime = "Sem parada";
+                                stime = "sem parada";
 
                             return stime;
                         }
@@ -64,14 +64,12 @@ gmap.directive("rotaplusTimePicker", function () {
                     element.val(sItem.toString());
                     element.css('width', (sItem.value.length * 5) + 'px');
 
-
                     treeScopeFinder[ngModelArray[ngModelArray.length - 1]] = sItem;
-
                 });
             });
 
             if (treeScopeFinder[ngModelArray[ngModelArray.length - 1]] == null) {
-                element.val('Sem parada');
+                element.val('sem parada');
             }
 
         }

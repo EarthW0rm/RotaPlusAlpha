@@ -11,18 +11,12 @@ gmap.service("gmap-geocode-service", function ($q) {
         var latLng = null;
 
         if (autocompleteData.geometry) {
-            latLng = {
-                lat: autocompleteData.geometry.location.lat()
-                , lng: autocompleteData.geometry.location.lng()
-            };
+            latLng = new google.maps.LatLng(autocompleteData.geometry.location.lat() ,autocompleteData.geometry.location.lng());
         } else {
             try {
                 var latlngRegExp = new RegExp(/([ ]*)?([-+]?[0-9]+([.]{0,1})?([0-9]+)?)([ ]*)?([,])([ ]*)?([-+]?[0-9]+([.]{0,1})?([0-9]+)?)([ ]*)?/g);
                 if (latlngRegExp.test(autocompleteData.name))
-                    latLng = {
-                        lat: parseFloat(autocompleteData.name.split(',')[0])
-                        , lng: parseFloat(autocompleteData.name.split(',')[1])
-                    };
+                    latLng =  new google.maps.LatLng(parseFloat(autocompleteData.name.split(',')[0]), parseFloat(autocompleteData.name.split(',')[1]));
                 else
                     throw 'Latitude longitude inválida.';
             }

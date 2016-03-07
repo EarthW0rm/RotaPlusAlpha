@@ -1,13 +1,9 @@
 ﻿var rotaplus = angular.module('rotaplus');
-rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', function ($scope, geoCode) {
+rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', 'gmap-marker-service', function ($scope, geoCode, markerSrc) {
     $scope.currentMap = null;
     $scope.addressAutoComplete = null;
 
     $scope.waypoints = [];
-
-    $scope.test = function () {
-        debugger;
-    }
 
     $scope.$watch('addressAutoComplete', function (newValue, oldValue) {
         if ($scope.addressAutoComplete != null)
@@ -28,16 +24,26 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
             if (!duplicated) {
                 var nWaypoint = data.result;
                 nWaypoint.stopSeconds = 1800;
-                nWaypoint.stopTimeControl = "Sem parada";
+                nWaypoint.stopTimeControl = "sem parada";
 
-                $scope.waypoints.push(nWaypoint);
+                markerSrc.addMarker(nWaypoint, $scope.currentMap).then(function () {
+                    $scope.waypoints.push(nWaypoint);
+                });
+                
             } else {
                 window.alert('Localidade já adicionada.');
             }
+        }).then(function () {
+            markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
         });
     };
 
     $scope.RemoverWayPoint = function (index) {
+        if ($scope.waypoints[index].currentMarker) {
+            $scope.waypoints[index].currentMarker.setMap(null);
+            $scope.waypoints[index].currentMarker = null;
+        }
+
         $scope.waypoints.splice(index, 1);
     }
 
