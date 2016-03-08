@@ -1,8 +1,7 @@
 ﻿var rotaplus = angular.module('rotaplus');
-rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', 'gmap-marker-service', function ($scope, geoCode, markerSrc) {
+rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', 'gmap-marker-service', 'gmap-directions-service', function ($scope, geoCode, markerSrc, direcSrc) {
     $scope.currentMap = null;
     $scope.addressAutoComplete = null;
-
     $scope.waypoints = [];
 
     $scope.$watch('addressAutoComplete', function (newValue, oldValue) {
@@ -45,7 +44,21 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
         }
 
         $scope.waypoints.splice(index, 1);
-    }
+
+        markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
+    };
+
+    $scope.CalcularRota = function () {
+        direcSrc.ObterDirecoes($scope.waypoints).then(function (data) {
+            debugger;
+        }
+        , function (data) {
+            debugger;
+        }
+        , function (data) {
+            debugger;
+        });
+    };
 
 
 }]);
