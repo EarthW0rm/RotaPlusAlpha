@@ -52,15 +52,27 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
         markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
     };
 
+    $scope.directionsDisplays = [];
+
     $scope.CalcularRota = function () {
-        direcSrc.ObterDirecoes($scope.waypoints).then(function (data) {
+        direcSrc.ObterDirecoes($scope.waypoints, $scope.DepartureDate).then(function (data) {
             debugger;
-        }
-        , function (data) {
-            debugger;
-        }
-        , function (data) {
-            debugger;
+
+            _.each($scope.directionsDisplays, function (display) {
+                display.setMap(null);
+            });
+
+            $scope.directionsDisplays = [];
+
+            for (var i = 0; i < data.pages.length; i++) {
+                var directionsDisplay = new google.maps.DirectionsRenderer();
+
+                directionsDisplay.setMap($scope.currentMap);
+                directionsDisplay.setOptions({ suppressMarkers: true });
+                directionsDisplay.setDirections(data.pages[i].responseDirections);
+                
+                $scope.directionsDisplays.push(directionsDisplay);
+            }
         });
     };
 

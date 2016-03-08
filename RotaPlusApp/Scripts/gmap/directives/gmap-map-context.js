@@ -17,7 +17,6 @@ gmap.directive('gmapMapContext', ['$compile', '$rootScope', function ($compile, 
                     });
 
                 scope.$parent[scope.currentMap].addListener('click', function (e) {
-                    debugger;
                     scope.mapClick(e);
                 });
 
