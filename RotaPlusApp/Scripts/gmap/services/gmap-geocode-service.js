@@ -40,11 +40,6 @@ gmap.service("gmap-geocode-service", function ($q) {
                             }
                         };
 
-                        if (autocompleteData.formatted_address)
-                            rObj.result.input_string = autocompleteData.formatted_address;
-                        else if (autocompleteData.name)
-                            rObj.result.input_string = autocompleteData.name;
-
                         for (var i = 0; i < results.length; i++) {
                             if (results[i].formatted_address.toUpperCase().indexOf("UNNAMED") < 0) {
                                 rObj.result.formatted_address = results[i].formatted_address;
@@ -52,6 +47,13 @@ gmap.service("gmap-geocode-service", function ($q) {
                             }
                         }
 
+                        if (autocompleteData.formatted_address)
+                            rObj.result.input_string = autocompleteData.formatted_address;
+                        else if (autocompleteData.name)
+                            rObj.result.input_string = autocompleteData.name;
+                        else
+                            rObj.result.input_string = rObj.result.formatted_address;
+                        
                         resolve(rObj);
                     } else {
                         reject({ success: false, error: { GeoCodeStatus: status }, message: "Não foi possivelo localizar a localidade informada." });

@@ -6,6 +6,7 @@ gmap.directive('gmapMapContext', ['$compile', '$rootScope', function ($compile, 
         , scope: {
             currentMap: '@gmMapModel'
             , currentMapContainer: '@gmMapContainer'
+            , mapClick: '=gmMapClick'
         }
         , link: {
             pre: function preLink(scope, element, attrs) {
@@ -15,6 +16,10 @@ gmap.directive('gmapMapContext', ['$compile', '$rootScope', function ($compile, 
                         mapTypeControl: false
                     });
 
+                scope.$parent[scope.currentMap].addListener('click', function (e) {
+                    debugger;
+                    scope.mapClick(e);
+                });
 
                 scope.$parent[scope.currentMap].controls[google.maps.ControlPosition.TOP_LEFT].push($('.map-form')[0]);
                 //.map-form

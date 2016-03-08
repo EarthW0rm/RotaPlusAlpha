@@ -7,14 +7,14 @@
 
 <div ng-controller="rotaplus-map-controller" ng-cloak>
 
-    <div gmap-map-context gm-map-model="currentMap" gm-map-container="#map-container">
+    <div gmap-map-context gm-map-model="currentMap" gm-map-container="#map-container" gm-map-click="MapClick">
 
         <div id="map-container" style="width: 100%; min-height: 200px;"></div>
 
         <div class="box map-form">
             <div class="box-body">
                 <div class="row">
-                    
+
                     <div class="col-md-6 col-xs-12 pull-right margin-bottom">
                         <div class='input-group date setdatetimepicker'>
                             <input type="number" class="form-control" ng-model="PathSize" id="txtTrecho" placeholder="KMs Por Trecho." rotaplus-tooltip rptooltipplace="bottom" title="Informe a quantidade de quilometros que deseja percorrer entre as paradas.">
@@ -25,7 +25,7 @@
                     </div>
                     <div class="col-md-6 col-xs-12 pull-right margin-bottom">
                         <div class='input-group'>
-                            <input type="datetime" rotaplus-datetime-picker ng-model="DepartureDate" class="form-control" id="txtDepartureDate" placeholder="Data de Saida" rotaplus-tooltip rpTooltipPlace="bottom" title="Informe a Data de Partida para o trajeto.">
+                            <input type="datetime" rotaplus-datetime-picker ng-model="DepartureDate" class="form-control" id="txtDepartureDate" placeholder="Data de Saida" rotaplus-tooltip rptooltipplace="bottom" title="Informe a Data de Partida para o trajeto.">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -42,7 +42,7 @@
                         </div>
                     </div>
                 </div>
-                
+
 
                 <div class="row margin-bottom">
                     <ul class="todo-list waypoints" rotaplus-sortable rp-array-sorted-model="waypoints">
@@ -67,7 +67,7 @@
                                 <i class="fa fa-pause"></i>
                                 <input rotaplus-time-picker ng-model="waypoint.stopTimeControl" date-time-picker-format="HH:mm" value="sem parada" type="text">
                             </small>
-                                                        
+
                             <!-- General tools such as edit or delete-->
                             <div class="tools">
                                 <i class="fa fa-trash-o" ng-click="RemoverWayPoint($index)"></i>
@@ -79,7 +79,7 @@
 
 
 
-                
+
 
                 <div class="row" ng-show="waypoints.length > 1">
                     <button class="btn btn-primary pull-right" ng-click="CalcularRota()">Calcular rota</button>

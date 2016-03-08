@@ -9,8 +9,12 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
             $scope.IncluirWayPoint($scope.addressAutoComplete);
     });
 
+    $scope.MapClick = function (ev) {
+        $scope.IncluirWayPoint({ geometry: { location: ev.latLng } });
+    }
+
     $scope.IncluirWayPoint = function (waypointInfo) {
-        geoCode.GetGeocodeData($scope.addressAutoComplete).then(function (data) {
+        geoCode.GetGeocodeData(waypointInfo).then(function (data) {
             var duplicated = false;
 
             for (var i = 0; i < $scope.waypoints.length; i++) {
