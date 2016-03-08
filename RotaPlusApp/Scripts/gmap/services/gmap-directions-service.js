@@ -52,7 +52,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                             window.alert("Não foi possivel calcular esta rota");
                         }
                     });
-                }, 1000, false, data, i);
+                }, 1000 * i, false, data, i);
             }
 
             return deferred.promise;
@@ -235,7 +235,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
 
         directionsDisplay.setMap(gmapMap);
         directionsDisplay.setOptions({ suppressMarkers: true });
-        directionsDisplay.setDirections(responseDirections);
+        directionsDisplay.setDirections(angular.copy(responseDirections));
 
         return directionsDisplay;
     };

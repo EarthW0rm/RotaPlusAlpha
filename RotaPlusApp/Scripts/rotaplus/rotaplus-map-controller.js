@@ -70,7 +70,19 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
             markerSrc.fitBounds($scope.waypoints, $scope.currentMap);
             
             direcSrc.CalcularReducoes(data, $scope.waypoints).then(function (reductions) {
-                debugger;
+                for (var i = 0; i < reductions.reducedSteps.length; i++) {
+                    var step = reductions.reducedSteps[i];
+                    
+                    var f = _.filter($scope.waypoints, function (point) { return point.selectedLocation.lat() == step.start_location.lat() && point.selectedLocation.lng() == step.start_location.lng(); });
+
+                    if (f.length > 0)
+                    {
+                        debugger;
+                        step.isWaypoint = true;
+                    }
+                    
+
+                }
             });
 
             
