@@ -48,6 +48,8 @@ gmap.service("gmap-directions-service", function ($q, $timeout) {
                         if (status == google.maps.DirectionsStatus.OK) {
                             data.pages[i].responseDirections = result;
                             deferred.notify({ data: result, pages: data.pages });
+                        } else {
+                            window.alert("Não foi possivel calcular esta rota");
                         }
                     });
                 }, 1000, false, data, i);
