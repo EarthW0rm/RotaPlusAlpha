@@ -49,7 +49,7 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
 
         $scope.waypoints.splice(index, 1);
 
-        markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
+        markerSrc.fitBounds($scope.waypoints, $scope.currentMap);
     };
 
     $scope.directionsDisplays = [];
@@ -65,14 +65,27 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
             $scope.directionsDisplays = [];
 
             for (var i = 0; i < data.pages.length; i++) {
-                var directionsDisplay = new google.maps.DirectionsRenderer();
-
-                directionsDisplay.setMap($scope.currentMap);
-                directionsDisplay.setOptions({ suppressMarkers: true });
-                directionsDisplay.setDirections(data.pages[i].responseDirections);
-                
+                var directionsDisplay = direcSrc.ExibirDirecoes(data.pages[i].responseDirections, $scope.currentMap);
                 $scope.directionsDisplays.push(directionsDisplay);
             }
+            markerSrc.fitBounds($scope.waypoints, $scope.currentMap);
+
+
+            for (var i = 0; i < data.pages.length; i++) {
+                var legs = data.pages[i].responseDirections.routes[0].legs
+                for (var j = 0; j < legs.length; j++) {
+                    var leg = legs[j];
+                    for (var k = 0; k < leg.steps.length; k++) {
+                        var step = leg.steps[k];
+                        var km = step.distance.value / 1000
+
+                        if (km > 300) {
+                            debugger;
+                        }
+                    }
+                }
+            }
+
         });
     };
 

@@ -6,7 +6,6 @@ gmap.service("gmap-directions-service", function ($q, $timeout) {
     var googleDirectionsService = new google.maps.DirectionsService();
 
     this.ObterDirecoes = function (waypoins, departureDate) {
-        debugger;
         var ref = $q(function (resolve, reject) {
             var waypointsPages = [];
 
@@ -75,8 +74,14 @@ gmap.service("gmap-directions-service", function ($q, $timeout) {
     };
 
 
-    this.getDirections = function (waypoints) {
+    this.ExibirDirecoes = function (responseDirections, gmapMap) {
+        var directionsDisplay = new google.maps.DirectionsRenderer();
 
+        directionsDisplay.setMap(gmapMap);
+        directionsDisplay.setOptions({ suppressMarkers: true });
+        directionsDisplay.setDirections(responseDirections);
+
+        return directionsDisplay;
     };
 
 
