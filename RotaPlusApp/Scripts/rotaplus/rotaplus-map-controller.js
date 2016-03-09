@@ -89,7 +89,23 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                     if (fPoint.length > 0)
                     {
                         if (fPoint[0].index == 0) {
-                            markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/motorbike.png');
+                            var content = '<div>'
+                            +'<ul>'
+                            +'<li>'
+                            + '<h5>' + fPoint[0].input_string + '</h5>'
+                            +'</li>'
+                            +'<li>'
+                            +'<label>Data Partida</label>'
+                            + '<span>' + moment(dataAtual).format('DD/MM/YYYY HH:mm') + '</span>'
+                            +'</li>'
+                            +'<li>'
+                            + '<small>' + fPoint[0].selectedLocation.lat() + ', ' + fPoint[0].selectedLocation.lng() + '</small>'
+                            +'</li>'
+                            +'</ul>'
+                            +'</div>'
+
+
+                            markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/motorbike.png', content);
                         }
                         else {
                             markerSrc.addMarker(fPoint[0] , $scope.currentMap, 'Content/img/photo.png');
