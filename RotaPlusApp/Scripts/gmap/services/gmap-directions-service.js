@@ -82,7 +82,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
             var allSteps = [];
             var ttTrajeto = 0;
             
-            var maxDistanceToCalculate = 50 * 1000;
+            var maxDistanceToCalculate = 25 * 1000;
 
             for (var i = 0; i < data.pages.length; i++) {
                 var legs = data.pages[i].responseDirections.routes[0].legs

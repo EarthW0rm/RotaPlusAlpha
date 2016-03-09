@@ -4,16 +4,16 @@ gmap.service("gmap-marker-service", function ($q) {
     
     var googleGeocodeService = new google.maps.Geocoder();
 
-    this.addMarker = function (geocodeData, gmapMap) {
+    this.addMarker = function (geocodeData, gmapMap, icon) {
         return $q(function (resolve, reject) {
             geocodeData.currentMarker = new google.maps.Marker({
                 position: geocodeData.selectedLocation,
                 title: geocodeData.input_string,
-                icon: 'Content/img/star-3.png'
+                icon: icon ? icon : 'Content/img/star-3.png'
             });
             geocodeData.currentMarker.setMap(gmapMap);
 
-            resolve();
+            resolve(geocodeData.currentMarker);
         });
     };
 
@@ -25,7 +25,7 @@ gmap.service("gmap-marker-service", function ($q) {
             }
             gmapMap.fitBounds(bounds);
 
-            resolve();
+            resolve(bounds);
         });
     };
 
