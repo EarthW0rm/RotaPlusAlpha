@@ -84,6 +84,8 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                     
                     var fPoint = _.filter($scope.waypoints, function (point) { return point.selectedLocation.lat() == step.start_location.lat() && point.selectedLocation.lng() == step.start_location.lng(); });
 
+                    var datInicioTrecho = moment(dataAtual).format('DD/MM/YYYY HH:mm');
+
                     if (fPoint.length > 0)
                     {
                         if (fPoint[0].index == 0) {
@@ -96,22 +98,27 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                         step.isWaypoint = true;
 
                     } else if (totalPercorridoTrecho >= tamanhoTrecho) {
-                        markerSrc.addMarker({ selectedLocation: step.end_location }, $scope.currentMap, 'Content/img/fillingstation.png');
 
-
-
-                        
+                        geoCode.GetGeocodeData({ geometry: { location: step.end_location } }, step).then(function (data) {
+                            debugger;
+                            markerSrc.addMarker(data.result, $scope.currentMap, 'Content/img/fillingstation.png');
+                        });                       
+                                                
                         totalPercorridoTrecho = 0;
                     }
-                    else if (i == reductions.reducedSteps.length - 1) {
-                        markerSrc.addMarker($scope.waypoints[$scope.waypoints.length -1], $scope.currentMap, 'Content/img/finish.png');
-                    }
+
+
+                    
 
                     totalPercorridoTrecho += step.distance.value;
                     totalPercorrido += step.distance.value;
 
                     totalSeconds += step.duration.value;
                     dataAtual.setSeconds(dataAtual.getSeconds() + step.duration.value);
+
+                    if (i == reductions.reducedSteps.length - 1) {
+                        markerSrc.addMarker($scope.waypoints[$scope.waypoints.length - 1], $scope.currentMap, 'Content/img/finish.png');
+                    }
 
                 }
             });

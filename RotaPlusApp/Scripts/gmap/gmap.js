@@ -6,4 +6,5 @@ gmap.run(['$rootScope', function ($rootScope) {
     $('#map-container').css('height', mapHeight + 'px');
     $('.waypoints').css('max-height', (mapHeight - 400) + 'px');
 
+    moment().locale('pt-br');
 }]);

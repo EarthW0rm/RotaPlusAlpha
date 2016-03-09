@@ -5,7 +5,7 @@ gmap.service("gmap-geocode-service", function ($q) {
     var googleGeocodeService = new google.maps.Geocoder();
 
     
-    this.GetGeocodeData = function (autocompleteData) {
+    this.GetGeocodeData = function (autocompleteData, retParameter) {
         return $q(function (resolve, reject) {
             var latLng = null;
 
@@ -38,6 +38,7 @@ gmap.service("gmap-geocode-service", function ($q) {
                                     return location.lat == this.selectedLocation.lat && location.lng == this.selectedLocation.lng
                                 }
                             }
+                            , retParameter: retParameter
                         };
 
                         for (var i = 0; i < results.length; i++) {
