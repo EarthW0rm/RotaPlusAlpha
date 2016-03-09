@@ -62,7 +62,8 @@ gmap.directive("rotaplusTimePicker", function () {
                     }
                     sItem.value = sItem.toString();
                     element.val(sItem.toString());
-                    element.css('width', (sItem.value.length * 5) + 'px');
+                    if (attrs.autoWidth && attrs.autoWidth.toLocaleLowerCase() == "true")
+                        element.css('width', (sItem.value.length * 5) + 'px');
 
                     treeScopeFinder[ngModelArray[ngModelArray.length - 1]] = sItem;
                 });

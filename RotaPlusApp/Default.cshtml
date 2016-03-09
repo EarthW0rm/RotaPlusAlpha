@@ -14,8 +14,15 @@
         <div class="box map-form">
             <div class="box-body">
                 <div class="row">
-
-                    <div class="col-md-6 col-xs-12 pull-right margin-bottom">
+                    <div class="col-md-4 col-xs-12 pull-right margin-bottom">
+                        <div class='input-group'>
+                            <input type="datetime" rotaplus-time-picker date-time-picker-format="HH:mm" ng-model="TimeStop" class="form-control" placeholder="Tempo parada" rotaplus-tooltip rptooltipplace="bottom" title="Informe o tempo de parada por trecho.">
+                            <span class="input-group-addon">
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12 pull-right margin-bottom">
                         <div class='input-group date setdatetimepicker'>
                             <input type="number" class="form-control" ng-model="PathSize" id="txtTrecho" placeholder="KMs Por Trecho." rotaplus-tooltip rptooltipplace="bottom" title="Informe a quantidade de quilometros que deseja percorrer entre as paradas.">
                             <span class="input-group-addon">
@@ -23,7 +30,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xs-12 pull-right margin-bottom">
+                    <div class="col-md-4 col-xs-12 pull-right margin-bottom">
                         <div class='input-group'>
                             <input type="datetime" rotaplus-datetime-picker ng-model="DepartureDate" class="form-control" id="txtDepartureDate" placeholder="Data de Saida" rotaplus-tooltip rptooltipplace="bottom" title="Informe a Data de Partida para o trajeto.">
                             <span class="input-group-addon">
@@ -31,6 +38,7 @@
                             </span>
                         </div>
                     </div>
+                    
                 </div>
                 <div class="row">
                     <div class="col-md-12 col-xs-12 margin-bottom">
@@ -65,11 +73,11 @@
 
                             <small ng-if="!$first && !$last" class="label label-success label-time" rotaplus-tooltip title="Alterar tempo de parada">
                                 <i class="fa fa-pause"></i>
-                                <input rotaplus-time-picker ng-model="waypoint.stopTimeControl" date-time-picker-format="HH:mm" value="sem parada" type="text">
+                                <input rotaplus-time-picker auto-width="true" ng-model="waypoint.stopTimeControl" date-time-picker-format="HH:mm" value="sem parada" type="text">
                             </small>
 
                             <!-- General tools such as edit or delete-->
-                            <div class="tools">
+                            <div class="tools" ng-show="!haveCalc">
                                 <i class="fa fa-trash-o" ng-click="RemoverWayPoint($index)"></i>
                             </div>
                         </li>

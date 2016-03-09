@@ -3,18 +3,24 @@ var gmap = angular.module("gmap");
 
 gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
 
-    var googleDirectionsService = new google.maps.DirectionsService();
+    /*OBTERROTA*/    
+    var paginarWaypoints = function (waypoints, departureDate) {
+        var primaryProcess = $q.defer();
 
-    this.ObterDirecoes = function (waypoins, departureDate) {
-        var ref = $q(function (resolve, reject) {
+        $timeout(function (waypoints, departureDate) {
+            debugger;
+            
             var waypointsPages = [];
+            primaryProcess.notify({ message: 'Iniciando divisão de pontos do trajeto.' });
 
-            for (var i = 0; i < waypoins.length; i += 9) {
-                waypointsPages.push({ itens: waypoins.slice(i, 9 + i + 1) });
+            for (var i = 0; i < waypoints.length; i += 9) {
+                waypointsPages.push({ itens: waypoints.slice(i, 9 + i + 1) });
+                primaryProcess.notify({ message: 'Página de pontos criada...' });
             }
 
-            for (var i = 0; i < waypointsPages.length; i++) {
+            primaryProcess.notify({ message: 'Criando solicitações de rota.' });
 
+            for (var i = 0; i < waypointsPages.length; i++) {
                 waypointsPages[i].requestDirections = {
                     origin: waypointsPages[i].itens.slice(0, 1)[0].selectedLocation
                     , destination: waypointsPages[i].itens.slice(waypointsPages[i].itens.length - 1, waypointsPages[i].itens.length)[0].selectedLocation
@@ -24,57 +30,92 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                     , optimizeWaypoints: false
                     , travelMode: google.maps.DirectionsTravelMode.DRIVING
                     , transitOptions: {
-                        departureTime: departureDate ? departureDate.date : new Date()
+                        departureTime: departureDate ? departureDate : new Date()
                     }
                     , drivingOptions: {
-                        departureTime: departureDate ? departureDate.date : new Date()
-                        , trafficModel: "pessimistic" // google.maps.TrafficModel.OPTIMISTIC, google.maps.TrafficModel.BEST_GUESS
-
+                        departureTime: departureDate ? departureDate : new Date()
+                        , trafficModel: "pessimistic"
                     }
                     , unitSystem: google.maps.UnitSystem.METRIC
                 };
+                primaryProcess.notify({ message: 'Solicitação de rota criada...' });
             }
 
-            resolve({ pages: waypointsPages });
+            primaryProcess.notify({ message: waypoints.length + " pontos no trajeto, dividido em " + waypointsPages.length + (waypointsPages.length > 1 ? ' rota' : ' rotas'), responseData: waypointsPages });
+            primaryProcess.resolve({ responseData: waypointsPages });
 
-        }).then(function (data) {
-            var deferred = $q.defer();
-
-            var directionsService = new google.maps.DirectionsService();
-
-            for (var i = 0; i < data.pages.length; i++) {
-                $timeout(function (data, i) {
-                    directionsService.route(data.pages[i].requestDirections, function (result, status) {
-                        if (status == google.maps.DirectionsStatus.OK) {
-                            data.pages[i].responseDirections = result;
-                            deferred.notify({ data: result, pages: data.pages });
-                        } else {
-                            window.alert("Não foi possivel calcular esta rota");
-                        }
-                    });
-                }, 1000 * i, false, data, i);
-            }
-
-            return deferred.promise;
-        });
-
-        var deferred = $q.defer();
-
-        ref.then(function (data) { }
-        , function (data) { }
-        , function (data) {
-            return $q(function (resolve, reject) {
-                var leftDirections = _.filter(data.pages, function (page) { return !page.responseDirections })
-
-                if (leftDirections.length == 0)
-                    deferred.resolve(data);
-            });
-
-        });
-
-        return deferred.promise
+        }, 0, false, waypoints, departureDate);
+        
+        return primaryProcess.promise;
     };
 
+    var requisitarRotasWaypoints = function (paginarWaypointsResponse, departureDate) {
+        debugger;
+        var primaryProcess = $q.defer();
+
+        var directionsService = new google.maps.DirectionsService();
+
+        for (var i = 0; i < paginarWaypointsResponse.responseData.length; i++) {
+
+            $timeout(function (pagesArray, index) {
+                primaryProcess.notify({ message: 'Efetuando a solicitação do mapeamento da rota...' });
+                directionsService.route(pagesArray[index].requestDirections, function (result, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+                        primaryProcess.notify({ message: 'Recebendo dados de trajeto de rota...' });
+                        pagesArray[index].responseDirections = result;
+                        
+                        if (_.filter(pagesArray, function (page) { return !page.responseDirections }).length == 0) 
+                            primaryProcess.resolve({ responseData: result, pages: pagesArray });
+                        
+                    } else {
+                        window.alert("Não foi possivel calcular esta rota");
+                    }
+                });
+            }, 1000 * i, false, paginarWaypointsResponse.responseData, i);
+        }    
+        return primaryProcess.promise;
+    };
+    
+    this.ObterRota = function (waypoins, departureDate) {
+        var primaryProcess = $q.defer();
+
+        paginarWaypoints(waypoins, departureDate)
+            .then(
+            /*Resolve*/
+            function (response) {
+                debugger;
+                return requisitarRotasWaypoints(response, departureDate);
+            },
+            /*Error*/
+            function (error) {
+                primaryProcess.reject(error);
+            },
+            /*Notify*/
+            function (update) {
+                debugger;
+                primaryProcess.notify(update);
+            })
+            .then(
+                /*Resolve*/
+                function (response) {
+                    debugger;
+                    primaryProcess.resolve(response);
+                },
+                /*Error*/
+                function (error) {
+                    primaryProcess.reject(error);
+                },
+                /*Notify*/
+                function (update) {
+                    debugger;
+                    primaryProcess.notify(update);
+                });
+
+        return primaryProcess.promise;        
+    };
+    /*OBTERROTA*/
+
+    /*CALCULARREDUCOES*/
     this.CalcularReducoes = function (data, waypoints) {
         var proccess = $q(function (resolve, reject) {
 
@@ -82,7 +123,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
             var allSteps = [];
             var ttTrajeto = 0;
             
-            var maxDistanceToCalculate = 1000 * 1000;
+            var maxDistanceToCalculate = 25 * 1000;
 
             for (var i = 0; i < data.pages.length; i++) {
                 var legs = data.pages[i].responseDirections.routes[0].legs
@@ -233,8 +274,8 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
 
         return deferred.promise;
     }
-
-
+    
+    /*CALCULARREDUCOES*/
     this.ExibirDirecoes = function (responseDirections, gmapMap) {
         var directionsDisplay = new google.maps.DirectionsRenderer();
 

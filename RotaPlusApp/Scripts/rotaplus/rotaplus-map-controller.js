@@ -1,68 +1,97 @@
 ﻿var rotaplus = angular.module('rotaplus');
 rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service', 'gmap-marker-service', 'gmap-directions-service', function ($scope, geoCode, markerSrc, direcSrc) {
+    //Controles Privados de escopo da controller
     $scope.currentMap = null;
     $scope.addressAutoComplete = null;
     $scope.waypoints = [];
 
+    $scope.directionsDisplays = [];
+    $scope.haveCalc = false;
+
+    //Models
+    $scope.DepartureDate = moment(new Date()).format("DD/MM/YYYY HH:mm");
+    $scope.PathSize = 150;
+    $scope.TimeStop = "30 minutos";
+        
+
+    //Watch
     $scope.$watch('addressAutoComplete', function (newValue, oldValue) {
         if ($scope.addressAutoComplete != null)
             $scope.IncluirWayPoint($scope.addressAutoComplete);
     });
 
+    //Map Events Callback
     $scope.MapClick = function (ev) {
         $scope.IncluirWayPoint({ geometry: { location: ev.latLng } });
     }
 
+    //Interações do usuário com o mapa
     $scope.IncluirWayPoint = function (waypointInfo) {
-        geoCode.GetGeocodeData(waypointInfo).then(function (data) {
-            var duplicated = false;
+        if (!$scope.haveCalc) {
+            geoCode.GetGeocodeData(waypointInfo).then(function (data) {
+                var duplicated = false;
 
-            for (var i = 0; i < $scope.waypoints.length; i++) {
-                if ($scope.waypoints[i].compare(data.result.selectedLocation)) {
-                    duplicated = true;
-                    break;
+                for (var i = 0; i < $scope.waypoints.length; i++) {
+                    if ($scope.waypoints[i].compare(data.result.selectedLocation)) {
+                        duplicated = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!duplicated) {
-                var nWaypoint = data.result;
-                nWaypoint.stopSeconds = 1800;
-                nWaypoint.stopTimeControl = "sem parada";
+                if (!duplicated) {
+                    var nWaypoint = data.result;
+                    nWaypoint.stopSeconds = 1800;
+                    nWaypoint.stopTimeControl = "sem parada";
 
-                markerSrc.addMarker(nWaypoint, $scope.currentMap);
-                
-                $scope.waypoints.push(nWaypoint);
+                    markerSrc.addMarker(nWaypoint, $scope.currentMap);
 
-            } else {
-                window.alert('Localidade já adicionada.');
-            }
-        }).then(function () {
-            markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
-        });
-    };
+                    $scope.waypoints.push(nWaypoint);
 
-    $scope.RemoverWayPoint = function (index) {
-        if ($scope.waypoints[index].currentMarker) {
-            $scope.waypoints[index].currentMarker.setMap(null);
-            $scope.waypoints[index].currentMarker = null;
+                } else {
+                    window.alert('Localidade já adicionada.');
+                }
+            }).then(function () {
+                markerSrc.fitBounds($scope.waypoints, $scope.currentMap)
+            });
         }
+    };
+    $scope.RemoverWayPoint = function (index) {
+        if (!$scope.haveCalc) {
+            if ($scope.waypoints[index].currentMarker) {
+                $scope.waypoints[index].currentMarker.setMap(null);
+                $scope.waypoints[index].currentMarker = null;
+            }
 
-        $scope.waypoints.splice(index, 1);
+            $scope.waypoints.splice(index, 1);
 
-        markerSrc.fitBounds($scope.waypoints, $scope.currentMap);
+            markerSrc.fitBounds($scope.waypoints, $scope.currentMap);
+        }
     };
 
-    $scope.directionsDisplays = [];
 
-    $scope.haveCalc = false;
+
+    
 
     $scope.CalcularRota = function () {
         $scope.haveCalc = true;
 
         $('#modalLoading').modal({ backdrop: 'static', keyboard: false });
 
-        direcSrc.ObterDirecoes($scope.waypoints, $scope.DepartureDate).then(function (data) {
+        var departureDate = angular.copy($scope.DepartureDate);
+        if (!departureDate.date) {
+            var dateNow = new Date();
 
+            departureDate = {
+                value: moment(dateNow).format("DD/MM/YYYY HH:mm"),
+                date: dateNow,
+                toString: function () {
+                    return moment(this.date).format("DD/MM/YYYY HH:mm");
+                }
+            };
+        }               
+
+        direcSrc.ObterRota($scope.waypoints, departureDate.date).then(function (data) {
+            debugger;
             _.each($scope.directionsDisplays, function (display) {
                 display.setMap(null);
             });
@@ -84,15 +113,16 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
 
                 var totalPercorridoTrechoSector = 0;
                 //TODO: Constante tamanho do trecho
-                var tamanhoTrecho = 130 * 1000;
-
+                
+                var tamanhoTrecho = (parseInt($scope.PathSize) > 0) ? parseInt($scope.PathSize) * 1000 : 150*1000;
+                
                 //TODO: Constante tempo parada abastecimento
-                var secAbastecimentoParada = 30 * 60;
+                var secAbastecimentoParada = !$scope.TimeStop || $scope.TimeStop.totalSeconds == undefined ? 30*60 : $scope.TimeStop.totalSeconds();
 
                 var totalSeconds = 0;
                 var totalSecondsTrecho = 0;
 
-                var dataAtual = $scope.DepartureDate ? $scope.DepartureDate.date : new Date();
+                var dataAtual = departureDate.date;
 
                 for (var i = 0; i < reductions.reducedSteps.length; i++) {
                     var step = reductions.reducedSteps[i];
@@ -120,6 +150,11 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                             +'</div>'
                             
                             totalPercorridoTrechoSector = 0;
+
+                            if (fPoint[0].currentMarker) {
+                                fPoint[0].currentMarker.setMap(null);
+                                fPoint[0].currentMarker = null;
+                            }
 
                             step.currentMarker = markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/motorbike.png', content);
                         }
@@ -178,6 +213,11 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                             + '</li>'
                             + '</ul>'
                             + '</div>'
+
+                            if (fPoint[0].currentMarker) {
+                                fPoint[0].currentMarker.setMap(null);
+                                fPoint[0].currentMarker = null;
+                            }
 
                             step.currentMarker = markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/photo.png', content);
 
@@ -291,12 +331,16 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                             + '</ul>'
                             + '</div>'
 
+                        if (endWaypoint.currentMarker) {
+                            endWaypoint.currentMarker.setMap(null);
+                            endWaypoint.currentMarker = null;
+                        }
+
                         step.currentMarker = markerSrc.addMarker(endWaypoint, $scope.currentMap, 'Content/img/finish.png', content);
                     }
 
                 }
             }).then(function () {
-                debugger;
                 $('#modalLoading').modal('hide');
             });
 
