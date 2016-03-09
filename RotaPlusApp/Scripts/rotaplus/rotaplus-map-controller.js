@@ -29,10 +29,10 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                 nWaypoint.stopSeconds = 1800;
                 nWaypoint.stopTimeControl = "sem parada";
 
-                markerSrc.addMarker(nWaypoint, $scope.currentMap).then(function () {
-                    $scope.waypoints.push(nWaypoint);
-                });
+                markerSrc.addMarker(nWaypoint, $scope.currentMap);
                 
+                $scope.waypoints.push(nWaypoint);
+
             } else {
                 window.alert('Localidade já adicionada.');
             }
@@ -54,7 +54,13 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
 
     $scope.directionsDisplays = [];
 
+    $scope.haveCalc = false;
+
     $scope.CalcularRota = function () {
+        $scope.haveCalc = true;
+
+        $('#modalLoading').modal({ backdrop: 'static', keyboard: false });
+
         direcSrc.ObterDirecoes($scope.waypoints, $scope.DepartureDate).then(function (data) {
 
             _.each($scope.directionsDisplays, function (display) {
@@ -75,8 +81,17 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
 
                 var totalPercorrido = 0;
                 var totalPercorridoTrecho = 0;
+
+                var totalPercorridoTrechoSector = 0;
+                //TODO: Constante tamanho do trecho
                 var tamanhoTrecho = 130 * 1000;
+
+                //TODO: Constante tempo parada abastecimento
+                var secAbastecimentoParada = 30 * 60;
+
                 var totalSeconds = 0;
+                var totalSecondsTrecho = 0;
+
                 var dataAtual = $scope.DepartureDate ? $scope.DepartureDate.date : new Date();
 
                 for (var i = 0; i < reductions.reducedSteps.length; i++) {
@@ -95,7 +110,7 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                             + '<h5>' + fPoint[0].input_string + '</h5>'
                             +'</li>'
                             +'<li>'
-                            +'<label>Data Partida</label>'
+                            +'<label>Data Partida: </label>'
                             + '<span>' + moment(dataAtual).format('DD/MM/YYYY HH:mm') + '</span>'
                             +'</li>'
                             +'<li>'
@@ -103,40 +118,186 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                             +'</li>'
                             +'</ul>'
                             +'</div>'
+                            
+                            totalPercorridoTrechoSector = 0;
 
-
-                            markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/motorbike.png', content);
+                            step.currentMarker = markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/motorbike.png', content);
                         }
                         else {
-                            markerSrc.addMarker(fPoint[0] , $scope.currentMap, 'Content/img/photo.png');
+                            var totalParada = fPoint[0].stopTimeControl.totalSeconds == undefined ? 0 : fPoint[0].stopTimeControl.totalSeconds();
+                            var paradaInfo = {}
+
+                            paradaInfo.dataChegada = new Date(dataAtual);
+                            dataAtual.setSeconds(dataAtual.getSeconds() + totalParada);
+
+                            paradaInfo.dataPartida = new Date(dataAtual);
+                            paradaInfo.tempoViagem = new Date(2016, 01, 01, 0, 0, totalSeconds, 0);
+                            paradaInfo.tempoViagemTrecho = new Date(2016, 01, 01, 0, 0, totalSecondsTrecho, 0);
+                            paradaInfo.totalPercorrido = totalPercorrido;
+                            paradaInfo.totalPercorridoTrechoSector = totalPercorridoTrechoSector;
+
+                            totalSeconds += totalParada;
+
+                            var content = '<div>'
+                            + '<ul>'
+                            + '<li>'
+                            + '<h5>' + fPoint[0].input_string + '</h5>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Data Chegada: </label>'
+                            + '<span>' + moment(paradaInfo.dataChegada).format('DD/MM/YYYY HH:mm') + '</span>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Data Partida: </label>'
+                            + '<span>' + moment(paradaInfo.dataPartida).format('DD/MM/YYYY HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Tempo de Viagem: </label>'
+                            + '<span>' + moment(paradaInfo.tempoViagem).format('HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Tempo de Trecho: </label>'
+                            + '<span>' + moment(paradaInfo.tempoViagemTrecho).format('HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Total rodado: </label>'
+                            + '<span>' + parseInt(paradaInfo.totalPercorrido / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Total setor: </label>'
+                            + '<span>' + parseInt(totalPercorridoTrechoSector / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            
+                            + '<li>'
+                            + '<small>' + fPoint[0].selectedLocation.lat() + ', ' + fPoint[0].selectedLocation.lng() + '</small>'
+                            + '</li>'
+                            + '</ul>'
+                            + '</div>'
+
+                            step.currentMarker = markerSrc.addMarker(fPoint[0], $scope.currentMap, 'Content/img/photo.png', content);
+
+                            totalPercorridoTrechoSector = 0;
                         }
 
                         step.isWaypoint = true;
 
                     } else if (totalPercorridoTrecho >= tamanhoTrecho) {
 
-                        geoCode.GetGeocodeData({ geometry: { location: step.end_location } }, step).then(function (data) {
-                            debugger;
-                            markerSrc.addMarker(data.result, $scope.currentMap, 'Content/img/fillingstation.png');
-                        });                       
+                        step.dataChegada = new Date(dataAtual);
+                        dataAtual.setSeconds(dataAtual.getSeconds() + secAbastecimentoParada);
+                        
+                        step.dataPartida = new Date(dataAtual);
+                        step.tempoViagem = new Date(2016, 01, 01, 0, 0, totalSeconds, 0);
+                        step.tempoViagemTrecho = new Date(2016, 01, 01, 0, 0, totalSecondsTrecho, 0);
+                        step.totalPercorrido = totalPercorrido;
+                        step.totalPercorridoTrechoSector = totalPercorridoTrechoSector;
+
+                        totalSeconds += secAbastecimentoParada;
+
+                        //geoCode.GetGeocodeData({ geometry: { location: step.end_location } }, step).then(function (data) {
+                            var content = '<div>'
+                            + '<ul>'
+                            + '<li>'
+                            + '<h5>Parada</h5>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Data Chegada: </label>'
+                            + '<span>' + moment(step.dataChegada).format('DD/MM/YYYY HH:mm') + '</span>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Data Partida: </label>'
+                            + '<span>' + moment(step.dataPartida).format('DD/MM/YYYY HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Tempo de Viagem: </label>'
+                            + '<span>' + moment(step.tempoViagem).format('HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Tempo de Trecho: </label>'
+                            + '<span>' + moment(step.tempoViagemTrecho).format('HH:mm') + '</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Total rodado: </label>'
+                            + '<span>' + parseInt(step.totalPercorrido / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Total setor: </label>'
+                            + '<span>' + parseInt(totalPercorridoTrechoSector / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<small>' + step.end_location.lat() + ', ' + step.end_location.lng() + '</small>'
+                            + '</li>'
+                            + '</ul>'
+                            + '</div>'
+
+                            step.currentMarker = markerSrc.addMarker({ selectedLocation: step.end_location }, $scope.currentMap, 'Content/img/fillingstation.png', content);
+                        //});                       
                                                 
+                        totalPercorridoTrechoSector = 0;
                         totalPercorridoTrecho = 0;
+                        totalSecondsTrecho = 0;
                     }
-
-
                     
-
                     totalPercorridoTrecho += step.distance.value;
                     totalPercorrido += step.distance.value;
+                    totalPercorridoTrechoSector += step.distance.value;
 
                     totalSeconds += step.duration.value;
+                    totalSecondsTrecho += step.duration.value;
+
                     dataAtual.setSeconds(dataAtual.getSeconds() + step.duration.value);
 
                     if (i == reductions.reducedSteps.length - 1) {
-                        markerSrc.addMarker($scope.waypoints[$scope.waypoints.length - 1], $scope.currentMap, 'Content/img/finish.png');
+                        var endWaypoint = $scope.waypoints[$scope.waypoints.length - 1];
+                        
+                        var totalTempo = new Date(2016, 01, 01, 0, 0, totalSeconds, 0);
+
+                        var content = '<div>'
+                            + '<ul>'
+                            + '<li>'
+                            + '<h5>' + endWaypoint.input_string + '</h5>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Data Chegada: </label>'
+                            + '<span>' + moment(dataAtual).format('DD/MM/YYYY HH:mm') + '</span>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Tempo de Viagem: </label>'
+                            + '<span>' + moment(totalTempo).format('HH:mm') + '</span>'
+                            + '</li>'
+                            + '<li>'
+                            + '<label>Total rodado: </label>'
+                            + '<span>' + parseInt(totalPercorrido / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<label>Total setor: </label>'
+                            + '<span>' + parseInt(totalPercorridoTrechoSector / 1000) + ' kms</span>'
+                            + '</li>'
+
+                            + '<li>'
+                            + '<small>' + endWaypoint.selectedLocation.lat() + ', ' + endWaypoint.selectedLocation.lng() + '</small>'
+                            + '</li>'
+                            + '</ul>'
+                            + '</div>'
+
+                        step.currentMarker = markerSrc.addMarker(endWaypoint, $scope.currentMap, 'Content/img/finish.png', content);
                     }
 
                 }
+            }).then(function () {
+                debugger;
+                $('#modalLoading').modal('hide');
             });
 
             

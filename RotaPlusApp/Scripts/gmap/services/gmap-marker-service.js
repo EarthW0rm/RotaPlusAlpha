@@ -5,7 +5,6 @@ gmap.service("gmap-marker-service", function ($q) {
     var googleGeocodeService = new google.maps.Geocoder();
 
     this.addMarker = function (geocodeData, gmapMap, icon, infoWindowContent) {
-        return $q(function (resolve, reject) {
             geocodeData.currentMarker = new google.maps.Marker({
                 position: geocodeData.selectedLocation,
                 title: geocodeData.input_string,
@@ -24,8 +23,7 @@ gmap.service("gmap-marker-service", function ($q) {
                 });
             }            
 
-            resolve(geocodeData.currentMarker);
-        });
+            return geocodeData.currentMarker;
     };
 
     this.fitBounds = function (markers, gmapMap) {

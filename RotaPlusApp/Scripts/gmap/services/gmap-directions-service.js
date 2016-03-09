@@ -82,7 +82,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
             var allSteps = [];
             var ttTrajeto = 0;
             
-            var maxDistanceToCalculate = 25 * 1000;
+            var maxDistanceToCalculate = 1000 * 1000;
 
             for (var i = 0; i < data.pages.length; i++) {
                 var legs = data.pages[i].responseDirections.routes[0].legs
@@ -165,18 +165,23 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                     pagePaths.push(_stepsToReduce[a].reducePagesPaths[b]);
                 }
             }
-            
-            for (var x = 0; x < pagePaths.length; x++) {
-                
-                $timeout(function (path, allSteps) {
-                    var distanceMatrixService = new google.maps.DistanceMatrixService();
-                    distanceMatrixService.getDistanceMatrix(path.requestDistance, function (result, status) {
-                        path.responseDistance = result
-                        deferred.notify({ steps: allSteps });
-                    });
+            if (pagePaths.length > 0) {
+                for (var x = 0; x < pagePaths.length; x++) {
 
-                }, 1000 * x, false, pagePaths[x], allSteps);
-                
+                    $timeout(function (path, allSteps) {
+                        var distanceMatrixService = new google.maps.DistanceMatrixService();
+                        distanceMatrixService.getDistanceMatrix(path.requestDistance, function (result, status) {
+                            path.responseDistance = result
+                            deferred.notify({ steps: allSteps });
+                        });
+
+                    }, 1000 * x, false, pagePaths[x], allSteps);
+
+                }
+            } else {
+                $timeout(function (allSteps) {
+                    deferred.notify({ steps: allSteps });
+                }, 500, false, allSteps);
             }
             
             return deferred.promise;

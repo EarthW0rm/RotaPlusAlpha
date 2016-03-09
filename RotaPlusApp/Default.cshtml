@@ -81,13 +81,29 @@
 
 
 
-                <div class="row" ng-show="waypoints.length > 1">
-                    <button class="btn btn-primary pull-right" ng-click="CalcularRota()">Calcular rota</button>
+                <div class="row" ng-show="waypoints.length > 1 ">
+                    <a href="/" class="btn btn-primary pull-left">Limpar</a>
+                    <button class="btn btn-primary pull-right" ng-show="!haveCalc" ng-click="CalcularRota()">Calcular rota</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<div class="modal" id="modalLoading" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Aguarde Calculando a Rota...</h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress progress-striped active" style="margin-bottom:0;"><div class="progress-bar" style="width: 100%"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts{
     <script type="text/javascript">
         var GoogleMap = null;
