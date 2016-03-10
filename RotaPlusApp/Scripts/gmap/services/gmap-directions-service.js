@@ -8,8 +8,7 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
         var primaryProcess = $q.defer();
 
         $timeout(function (waypoints, departureDate) {
-            debugger;
-            
+           
             var waypointsPages = [];
             primaryProcess.notify({ message: 'Iniciando divisão de pontos do trajeto.' });
 
@@ -50,7 +49,6 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
     };
 
     var requisitarRotasWaypoints = function (paginarWaypointsResponse, departureDate) {
-        debugger;
         var primaryProcess = $q.defer();
 
         var directionsService = new google.maps.DirectionsService();
@@ -64,14 +62,17 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                         primaryProcess.notify({ message: 'Recebendo dados de trajeto de rota...' });
                         pagesArray[index].responseDirections = result;
                         
-                        if (_.filter(pagesArray, function (page) { return !page.responseDirections }).length == 0) 
-                            primaryProcess.resolve({ responseData: result, pages: pagesArray });
+                        if (_.filter(pagesArray, function (page) { return !page.responseDirections }).length == 0) {
+                            primaryProcess.notify({ message: 'Rotas recebidas...' });
+                            primaryProcess.resolve({ responseData: result, pages: pagesArray });                            
+                        }
                         
                     } else {
                         window.alert("Não foi possivel calcular esta rota");
                     }
                 });
-            }, 1000 * i, false, paginarWaypointsResponse.responseData, i);
+            }, 1000 * i, true, paginarWaypointsResponse.responseData, i);
+
         }    
         return primaryProcess.promise;
     };
@@ -83,7 +84,6 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
             .then(
             /*Resolve*/
             function (response) {
-                debugger;
                 return requisitarRotasWaypoints(response, departureDate);
             },
             /*Error*/
@@ -92,13 +92,11 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
             },
             /*Notify*/
             function (update) {
-                debugger;
-                primaryProcess.notify(update);
+                return primaryProcess.notify(update);
             })
             .then(
                 /*Resolve*/
                 function (response) {
-                    debugger;
                     primaryProcess.resolve(response);
                 },
                 /*Error*/
@@ -107,7 +105,6 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                 },
                 /*Notify*/
                 function (update) {
-                    debugger;
                     primaryProcess.notify(update);
                 });
 
@@ -116,46 +113,36 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
     /*OBTERROTA*/
 
     /*CALCULARREDUCOES*/
-    this.CalcularReducoes = function (data, waypoints) {
-        var proccess = $q(function (resolve, reject) {
+    var spliStepsToReduce = function (data, waypoints) {
+        var primaryProcess = $q.defer();
 
-            var allLegs = [];
-            var allSteps = [];
-            var ttTrajeto = 0;
-            
+        $timeout(function (data, waypoints) {
             var maxDistanceToCalculate = 25 * 1000;
 
+            var allSteps = [];
+
+            primaryProcess.notify({message: "Filtrando passos do trajeto que necessitam de redução"});
             for (var i = 0; i < data.pages.length; i++) {
                 var legs = data.pages[i].responseDirections.routes[0].legs
                 for (var j = 0; j < legs.length; j++) {
-                    
-                    var leg = legs[j];
-                    leg.legIndex = j;
+                    legs[j].steps[0].start_location = waypoints[j].selectedLocation;
+                    legs[j].steps[0].path.splice(0, 0, waypoints[j].selectedLocation);
 
-                    leg.steps[0].start_location = waypoints[j].selectedLocation;
-
-                    leg.steps[0].path.splice(0, 0, waypoints[j].selectedLocation);
-
-                    allLegs.push(leg);
-                    for (var k = 0; k < leg.steps.length; k++) {
-                        var step = leg.steps[k];
-                        step.stepIndex = k;
-                        step.legIndex = j;
+                    for (var k = 0; k < legs[j].steps.length; k++) {
+                        var step = legs[j].steps[k];
                         step.haveSubSteps = step.distance.value > maxDistanceToCalculate;
-
                         allSteps.push(step);
                     }
                 }
             }
+            primaryProcess.notify({ message: "Localizado " + _.filter(allSteps, function (item) { return item.haveSubSteps; }).length + " passos para redução;" });
 
-            var _stepsToReduce = _.filter(allSteps, function (stp) {
-                return stp.haveSubSteps;
-            });
+            primaryProcess.notify({ message: "Iniciando processo de calculo de páginas para redução." });
+            var totalReduces = 0;
 
             for (var i = 0; i < allSteps.length; i++) {
                 var _stpReduce = allSteps[i];
                 if (_stpReduce.haveSubSteps) {
-
                     _stpReduce.reducePagesPaths = [];
 
                     var divizor = parseInt(_stpReduce.distance.value / maxDistanceToCalculate);
@@ -182,97 +169,125 @@ gmap.service("gmap-directions-service", function ($q, $timeout, $interval) {
                                 , unitSystem: google.maps.UnitSystem.METRIC
                             };
                             _stpReduce.reducePagesPaths.push(pathPage);
+                            totalReduces += 1;
                         }
                     }
                 }
             }
 
-            resolve(allSteps);
-
-        }).then(function (allSteps) {
-            var deferred = $q.defer();
+            primaryProcess.notify({ message: "Um total de " + totalReduces + " reduções serão calculadas, com base no divisor " + (maxDistanceToCalculate /1000) + " kms" });
             
-            var distanceMatrixService = new google.maps.DistanceMatrixService();
+            primaryProcess.resolve(allSteps);
 
-            var _stepsToReduce = _.filter(allSteps, function (stp) {
-                return stp.haveSubSteps;
-            });
+            //Fim Timeout
+        }, 0, false, data, waypoints);
+
+        return primaryProcess.promise;
+    }
+    
+    var calculateDistanceMatrix = function (allSteps) {
+        var primaryProcess = $q.defer();
+
+        $timeout(function (allSteps) {
+            primaryProcess.notify({ message: "Iniciando pesquisas de redução" });
+            var _stepsToReduce = _.filter(allSteps, function (stp) { return stp.haveSubSteps; });
 
             var pagePaths = [];
-
             for (var a = 0; a < _stepsToReduce.length; a++) {
-                for (var b = 0; b < _stepsToReduce[a].reducePagesPaths.length; b++)
-                {
+                for (var b = 0; b < _stepsToReduce[a].reducePagesPaths.length; b++) {
                     pagePaths.push(_stepsToReduce[a].reducePagesPaths[b]);
                 }
             }
+
             if (pagePaths.length > 0) {
                 for (var x = 0; x < pagePaths.length; x++) {
+                    $timeout(function (path, allSteps, index, total) {
+                        primaryProcess.notify({ message: "Solicitando calculo de redução nº" + index + " de " + total });
 
-                    $timeout(function (path, allSteps) {
                         var distanceMatrixService = new google.maps.DistanceMatrixService();
                         distanceMatrixService.getDistanceMatrix(path.requestDistance, function (result, status) {
+                            primaryProcess.notify({ message: "Agregando redução nº" + index + " de " + total });
                             path.responseDistance = result
-                            deferred.notify({ steps: allSteps });
+                            
+                            var valid = true;
+                            var steps = _.filter(allSteps, function (item) { return item.haveSubSteps });
+
+                            for (var i = 0; i < steps.length && valid; i++) {
+                                for (var j = 0; j < steps[i].reducePagesPaths.length && valid; j++) {
+                                    if (!steps[i].reducePagesPaths[j].responseDistance) {
+                                        valid = false;
+                                        break;}}}
+                            if (valid) {
+                                var transSteps = [];
+                                for (var i = 0; i < allSteps.length; i++) {
+                                    var currStep = allSteps[i];
+                                    if (!currStep.haveSubSteps) {
+                                        transSteps.push(currStep);
+                                    } else {
+                                        for (var j = 0; j < currStep.reducePagesPaths.length; j++) {
+
+                                            var redPage = currStep.reducePagesPaths[j];
+                                            var nStp = {
+                                                distance: redPage.responseDistance.rows[0].elements[0].distance
+                                                , duration: redPage.responseDistance.rows[0].elements[0].duration
+                                                , end_location: redPage.itens[redPage.itens.length - 1]
+                                                , start_location: redPage.itens[0]
+                                                , path: redPage.itens
+                                            };
+                                            transSteps.push(nStp);
+                                        }
+                                    }
+                                }
+                                primaryProcess.resolve({ reducedSteps: transSteps });
+                            }
+
                         });
 
-                    }, 1000 * x, false, pagePaths[x], allSteps);
-
+                    }, 1000 * x, false, pagePaths[x], allSteps, x, pagePaths.length);
                 }
             } else {
                 $timeout(function (allSteps) {
-                    deferred.notify({ steps: allSteps });
+                    primaryProcess.resolve({ reducedSteps: allSteps });
                 }, 500, false, allSteps);
             }
-            
-            return deferred.promise;
-        });
+        }, 0, false, allSteps);
 
-        var deferred = $q.defer();
+        return primaryProcess.promise;
+    }
+    
+    this.CalcularReducoes = function (data, waypoints) {
+        var primaryProcess = $q.defer();
 
-        proccess.then(function (data) { }
-        , function (data) { }
-        , function (data) {
-            var valid = true;
+        spliStepsToReduce(data, waypoints)
+            .then(
+            /*Resolve*/
+            function (response) {
+                return calculateDistanceMatrix(response);
+            },
+            /*Error*/
+            function (error) {
+                primaryProcess.reject(error);
+            },
+            /*Notify*/
+            function (update) {
+                return primaryProcess.notify(update);
+            })
+            .then(
+                /*Resolve*/
+                function (response) {
+                    primaryProcess.resolve(response);
+                },
+                /*Error*/
+                function (error) {
+                    primaryProcess.reject(error);
+                },
+                /*Notify*/
+                function (update) {
+                    primaryProcess.notify(update);
+                });
 
-            var steps = _.filter(data.steps, function (item) { return item.haveSubSteps });
-            for (var i = 0; i < steps.length && valid; i++) {
-                for (var j = 0; j < steps[i].reducePagesPaths.length && valid; j++) {
-                    if (!steps[i].reducePagesPaths[j].responseDistance) {
-                        valid = false;
-                        break;
-                    }
-                }
-            }
+        return primaryProcess.promise;
 
-            if (valid) {
-                
-                var transSteps = [];
-                for (var i = 0; i < data.steps.length; i++) {
-                    var currStep = data.steps[i];
-                    if (!currStep.haveSubSteps) {
-                        transSteps.push(currStep);
-                    } else {
-                        for (var j = 0; j < currStep.reducePagesPaths.length; j++) {
-                            
-                            var redPage = currStep.reducePagesPaths[j];
-                            var nStp = {
-                                distance: redPage.responseDistance.rows[0].elements[0].distance
-                                , duration: redPage.responseDistance.rows[0].elements[0].duration
-                                , end_location: redPage.itens[redPage.itens.length-1]
-                                , start_location: redPage.itens[0]
-                                , path: redPage.itens
-                            };
-                            transSteps.push(nStp);
-                        }
-                    }
-                }
-                deferred.resolve({reducedSteps: transSteps});
-            }
-
-        });
-
-        return deferred.promise;
     }
     
     /*CALCULARREDUCOES*/
