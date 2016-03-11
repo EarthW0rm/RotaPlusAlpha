@@ -106,14 +106,16 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
             //TODO: Constante tamanho do trecho
 
             var tamanhoTrecho = (parseInt($scope.PathSize) > 0) ? parseInt($scope.PathSize) * 1000 : 150 * 1000;
-
+            var secAlmocoJantar = 60 * 60;
             //TODO: Constante tempo parada abastecimento
             var secAbastecimentoParada = !$scope.TimeStop || $scope.TimeStop.totalSeconds == undefined ? 30 * 60 : $scope.TimeStop.totalSeconds();
 
             var totalSeconds = 0;
             var totalSecondsTrecho = 0;
-
             var dataAtual = departureDate.date;
+
+            var haveAlmoco = false;
+            var haveJantar = false;
 
             for (var i = 0; i < reductions.reducedSteps.length; i++) {
                 var step = reductions.reducedSteps[i];
@@ -218,6 +220,8 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
 
                 } else if (totalPercorridoTrecho >= tamanhoTrecho) {
 
+
+
                     step.dataChegada = new Date(dataAtual);
                     dataAtual.setSeconds(dataAtual.getSeconds() + secAbastecimentoParada);
 
@@ -276,6 +280,76 @@ rotaplus.controller('rotaplus-map-controller', ['$scope', 'gmap-geocode-service'
                     totalPercorridoTrechoSector = 0;
                     totalPercorridoTrecho = 0;
                     totalSecondsTrecho = 0;
+
+
+                } else if ((!haveAlmoco && dataAtual.getHours() == 13) || (!haveJantar && dataAtual.getHours() == 19)) {
+                    var horaAtual = dataAtual.getHours();
+                    
+                    step.dataChegada = new Date(dataAtual);
+                    dataAtual.setSeconds(dataAtual.getSeconds() + secAlmocoJantar);
+
+                    step.dataPartida = new Date(dataAtual);
+                    step.tempoViagem = new Date(2016, 01, 01, 0, 0, totalSeconds, 0);
+                    step.tempoViagemTrecho = new Date(2016, 01, 01, 0, 0, totalSecondsTrecho, 0);
+                    step.totalPercorrido = totalPercorrido;
+                    step.totalPercorridoTrechoSector = totalPercorridoTrechoSector;
+
+                    totalSeconds += secAlmocoJantar;
+
+                    var content = '<div>'
+                    + '<ul>'
+                    + '<li>'
+                    + '<h5>' + (horaAtual == 13? 'Almoço':'Jantar')  + '</h5>'
+                    + '</li>'
+                    + '<li>'
+                    + '<label>Data Chegada: </label>'
+                    + '<span>' + moment(step.dataChegada).format('DD/MM/YYYY HH:mm') + '</span>'
+                    + '</li>'
+                    + '<li>'
+                    + '<label>Data Partida: </label>'
+                    + '<span>' + moment(step.dataPartida).format('DD/MM/YYYY HH:mm') + '</span>'
+                    + '</li>'
+
+                    + '<li>'
+                    + '<label>Tempo de Viagem: </label>'
+                    + '<span>' + moment(step.tempoViagem).format('HH:mm') + '</span>'
+                    + '</li>'
+
+                    + '<li>'
+                    + '<label>Tempo de Trecho: </label>'
+                    + '<span>' + moment(step.tempoViagemTrecho).format('HH:mm') + '</span>'
+                    + '</li>'
+
+                    + '<li>'
+                    + '<label>Total rodado: </label>'
+                    + '<span>' + parseInt(step.totalPercorrido / 1000) + ' kms</span>'
+                    + '</li>'
+
+                    + '<li>'
+                    + '<label>Total setor: </label>'
+                    + '<span>' + parseInt(totalPercorridoTrechoSector / 1000) + ' kms</span>'
+                    + '</li>'
+
+                    + '<li>'
+                    + '<small>' + step.end_location.lat() + ', ' + step.end_location.lng() + '</small>'
+                    + '</li>'
+                    + '</ul>'
+                    + '</div>';
+
+
+                    step.currentMarker = markerSrc.addMarker({ selectedLocation: step.end_location }, $scope.currentMap, 'Content/img/restaurant.png', content);
+
+
+                    totalPercorridoTrechoSector = 0;
+                    totalPercorridoTrecho = 0;
+                    totalSecondsTrecho = 0;
+
+
+
+                    if (horaAtual == 13)
+                        haveAlmoco = true;
+                    else
+                        haveJantar = true;
                 }
 
                 totalPercorridoTrecho += step.distance.value;
